@@ -134,12 +134,18 @@
 						"main": "packages/react-native/index.ts",
 						"assets": [
 							"packages/react-native/*.md",
+							"packages/react-native/references.d.ts",
 							"packages/react-native/index.d.ts",
 							"LICENSE",
 							{
 								"glob": "**/*",
 								"input": "packages/react-native/platforms/",
 								"output": "./platforms/"
+							},
+							{
+								"glob": "**/*",
+								"input": "packages/react-native/typings/",
+								"output": "./typings/"
 							}
 						]
 					}
