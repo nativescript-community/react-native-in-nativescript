@@ -4,7 +4,7 @@ import { FrameNavigationProp } from "react-nativescript-navigation";
 import { MainStackParamList } from "./NavigationParamList";
 import type { ItemEventData } from "@nativescript/core";
 import { ListView, StyleSheet } from "react-nativescript";
-import { Dialogs, isAndroid } from "@nativescript/core";
+import { Dialogs, isAndroid, isIOS } from "@nativescript/core";
 
 type ContactsScreenProps = {
     route: RouteProp<MainStackParamList, "basic">,
@@ -32,7 +32,11 @@ const items: MyItem[] = [
                 }
                 return;
             }
-            console.log(`Sanity check not yet implemented for iOS (plugin only implemented for Android).`);
+            if(isIOS){
+                console.log(`RCTUIManager`, RCTUIManager);
+                return;
+            }
+            console.log(`Unimplemented platform!`);
         },
     },
 ];
