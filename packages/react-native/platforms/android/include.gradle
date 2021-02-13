@@ -1,28 +1,3 @@
-// android {}
-
-repositories {
-    google()
-    jcenter()
-    mavenLocal()
-    maven {
-        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-        url("$rootDir/../node_modules/react-native/android")
-    }
-    maven {
-        // Android JSC is installed from npm
-        url("$rootDir/../node_modules/jsc-android/dist")
-    }
-}
-beforeEvaluate { project ->
-    if (rootProject.hasProperty("userDefinedGradleProperties")) {
-        rootProject.ext.userDefinedGradleProperties.each { entry ->
-            def propertyName = entry.getKey()
-            def propertyValue = entry.getValue()
-            project.ext.set(propertyName, propertyValue)
-        }
-    }
-}
-
 allprojects {
     repositories {
         google()
