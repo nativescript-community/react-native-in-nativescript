@@ -19,6 +19,10 @@ const items: MyItem[] = [
         label: "Basic tests",
         route: "basic",
     },
+    {
+        label: "UI tests",
+        route: "ui",
+    },
 ];
 
 const cellFactory = (item: MyItem) => {

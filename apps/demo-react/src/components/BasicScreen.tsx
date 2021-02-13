@@ -6,7 +6,7 @@ import type { ItemEventData } from "@nativescript/core";
 import { ListView, StyleSheet } from "react-nativescript";
 import { Dialogs, isAndroid, isIOS } from "@nativescript/core";
 
-type ContactsScreenProps = {
+type BasicScreenProps = {
     route: RouteProp<MainStackParamList, "basic">,
     navigation: FrameNavigationProp<MainStackParamList, "basic">,
 }
@@ -45,7 +45,7 @@ const cellFactory = (item: MyItem) => {
     return <label style={styles.label}>{item.label}</label>;
 };
 
-export function BasicScreen({ navigation }: ContactsScreenProps) {
+export function BasicScreen({ navigation }: BasicScreenProps) {
     const onItemTap = (args: ItemEventData) => {
         const index: number = args.index;
         const item: MyItem = items[index];
