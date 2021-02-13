@@ -1,6 +1,21 @@
 import { View, CssProperty, Style, LayoutBase, makeValidator, makeParser, unsetValue, CSSType, ShorthandProperty } from '@nativescript/core';
 import type { FlexDirection, FlexWrap, JustifyContent, AlignItems, AlignContent, AlignSelf } from '@nativescript/core/ui/layouts/flexbox-layout';
-import { FlexboxLayoutBase, flexGrowProperty, flexShrinkProperty, FlexGrow, FlexShrink, FlexBasisPercent, Basis } from '@nativescript/core/ui/layouts/flexbox-layout/flexbox-layout-common';
+import {
+    FlexboxLayoutBase,
+    FlexGrow,
+    FlexShrink,
+    FlexBasisPercent,
+    Basis,
+    flexDirectionProperty,
+    flexWrapProperty,
+    justifyContentProperty,
+    alignItemsProperty,
+    orderProperty,
+    flexGrowProperty,
+    flexShrinkProperty,
+    flexWrapBeforeProperty,
+    alignSelfProperty,
+} from '@nativescript/core/ui/layouts/flexbox-layout/flexbox-layout-common';
 
 // We don't implement Order, FlexWrapBefore, flex-flow.
 
@@ -125,60 +140,60 @@ function validateArgs(element: View): View {
  */
 @CSSType('RNLayout')
 export abstract class RNLayoutBase extends FlexboxLayoutBase {
-	get flexDirection(): FlexDirection {
-		return this.style.flexDirection;
-	}
-	set flexDirection(value: FlexDirection) {
-		this.style.flexDirection = value;
-	}
+	// get flexDirection(): FlexDirection {
+	// 	return this.style.flexDirection;
+	// }
+	// set flexDirection(value: FlexDirection) {
+	// 	this.style.flexDirection = value;
+	// }
 
-	get flexWrap(): FlexWrap {
-		return this.style.flexWrap;
-	}
-	set flexWrap(value: FlexWrap) {
-		this.style.flexWrap = value;
-	}
+	// get flexWrap(): FlexWrap {
+	// 	return this.style.flexWrap;
+	// }
+	// set flexWrap(value: FlexWrap) {
+	// 	this.style.flexWrap = value;
+	// }
 
-	get justifyContent(): JustifyContent {
-		return this.style.justifyContent;
-	}
-	set justifyContent(value: JustifyContent) {
-		this.style.justifyContent = value;
-	}
+	// get justifyContent(): JustifyContent {
+	// 	return this.style.justifyContent;
+	// }
+	// set justifyContent(value: JustifyContent) {
+	// 	this.style.justifyContent = value;
+	// }
 
-	get alignItems(): AlignItems {
-		return this.style.alignItems;
-	}
-	set alignItems(value: AlignItems) {
-		this.style.alignItems = value;
-	}
+	// get alignItems(): AlignItems {
+	// 	return this.style.alignItems;
+	// }
+	// set alignItems(value: AlignItems) {
+	// 	this.style.alignItems = value;
+	// }
 
-	get alignContent(): AlignContent {
-		return this.style.alignContent;
-	}
-	set alignContent(value: AlignContent) {
-		this.style.alignContent = value;
-	}
+	// get alignContent(): AlignContent {
+	// 	return this.style.alignContent;
+	// }
+	// set alignContent(value: AlignContent) {
+	// 	this.style.alignContent = value;
+	// }
 
 	public static setFlexGrow(view: View, grow: number) {
-		validateArgs(view).style.flexGrow = grow;
+        super.setFlexGrow(view, grow);
 	}
 	public static getFlexGrow(view: View) {
-		return validateArgs(view).style.flexGrow;
+        return super.getFlexGrow(view);
 	}
 
 	public static setFlexShrink(view: View, shrink: number) {
-		validateArgs(view).style.flexShrink = shrink;
+        super.setFlexShrink(view, shrink);
 	}
 	public static getFlexShrink(view: View): number {
-		return validateArgs(view).style.flexShrink;
+        return super.getFlexShrink(view);
 	}
 
 	public static setAlignSelf(view: View, align: AlignSelf) {
-		validateArgs(view).style.alignSelf = align;
+        super.setAlignSelf(view, align);
 	}
 	public static getAlignSelf(view: View): AlignSelf {
-		return validateArgs(view).style.alignSelf;
+        return this.getAlignSelf(view);
 	}
 }
 
