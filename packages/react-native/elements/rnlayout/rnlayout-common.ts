@@ -1,5 +1,5 @@
 import { View, CssProperty, Style, LayoutBase, makeValidator, makeParser, unsetValue, CSSType, ShorthandProperty } from '@nativescript/core';
-import type { FlexDirection, FlexWrap, JustifyContent, AlignItems, AlignContent, AlignSelf } from '@nativescript/core/ui/layouts/flexbox-layout';
+import { FlexDirection, FlexWrap, JustifyContent, AlignItems, AlignContent, AlignSelf } from '@nativescript/core/ui/layouts/flexbox-layout/flexbox-layout-common';
 import {
     FlexboxLayoutBase,
     FlexGrow,
@@ -379,3 +379,20 @@ RNLayoutBase.prototype.recycleNativeView = 'auto';
 // 	},
 // });
 // flexProperty.register(Style);
+
+export {
+    FlexDirection,
+    FlexWrap,
+};
+
+export {
+    flexDirectionProperty,
+    flexWrapProperty,
+    justifyContentProperty,
+    alignItemsProperty,
+    orderProperty,
+    flexGrowProperty,
+    flexShrinkProperty,
+    flexWrapBeforeProperty,
+    alignSelfProperty,
+};

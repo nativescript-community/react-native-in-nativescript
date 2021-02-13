@@ -1,5 +1,5 @@
 import { View, CssProperty, Style, LayoutBase } from '@nativescript/core';
-import type { FlexDirection, FlexWrap, JustifyContent, AlignItems, AlignContent, Order, FlexGrow, FlexShrink, FlexWrapBefore, AlignSelf } from '@nativescript/core';
+import { FlexDirection, FlexWrap, JustifyContent, AlignItems, AlignContent, Order, FlexGrow, FlexShrink, FlexWrapBefore, AlignSelf } from '@nativescript/core';
 import type { RNFlexDirection, RNFlexWrap, RNJustifyContent, RNAlignItems, RNAlignContent, RNOrder, RNFlexGrow, RNFlexShrink, RNFlexWrapBefore, RNAlignSelf } from './rnlayout-common';
 import {
     flexDirectionProperty,
@@ -41,6 +41,11 @@ export type { RNFlexWrapBefore };
 
 export type { RNAlignSelf };
 
+/**
+ * TODO: RCTView doesn't expose any styling, but RCTShadowView does.
+ * Android mentioned shadow views too. So that's probably the thing to implement.
+ * @see RCTShadowView
+ */
 export class RNFlexboxLayout extends FlexboxLayout {
 	public static setFlexGrow(view: View, grow: number);
 	public static getFlexGrow(view: View);
@@ -51,6 +56,11 @@ export class RNFlexboxLayout extends FlexboxLayout {
 	public static setAlignSelf(view: View, align: AlignSelf);
 	public static getAlignSelf(view: View): AlignSelf;
 }
+
+export {
+    FlexDirection,
+    FlexWrap,
+};
 
 export {
     flexDirectionProperty,
