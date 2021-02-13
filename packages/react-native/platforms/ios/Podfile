@@ -1,0 +1,6 @@
+# NativeScript supports down to 10.0 usually.
+platform :ios, '11.0'
+
+# https://github.com/facebook/react-native/blob/master/React.podspec
+# https://cocoapods.org/pods/React (no longer published online)
+pod 'React', path: '../../node_modules/react-native'

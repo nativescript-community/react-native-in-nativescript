@@ -1,0 +1,1 @@
+/// <reference path="./typings/java!react-native-0.63.4.d.ts" />

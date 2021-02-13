@@ -1,0 +1,38 @@
+{
+	"name": "@nativescript-community/react-native",
+	"version": "0.0.1",
+	"description": "Add a plugin description",
+	"main": "index",
+	"typings": "index.d.ts",
+	"nativescript": {
+		"platforms": {
+            "ios": "7.0.6",
+            "android": "7.0.1"
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/nativescript-community/react-native-in-nativescript.git"
+	},
+	"keywords": [
+		"NativeScript",
+		"JavaScript",
+		"TypeScript",
+		"iOS",
+		"Android"
+	],
+    "peerDependencies": {
+        "react-native": "0.63.4"
+    },
+	"author": {
+		"name": "NativeScript",
+		"email": "oss@nativescript.org"
+	},
+    "bugs": {
+        "url": "https://github.com/nativescript-community/react-native-in-nativescript/issues"
+    },
+	"license": "Apache-2.0",
+	"homepage": "https://github.com/nativescript-community/react-native-in-nativescript",
+	"readmeFilename": "README.md",
+	"bootstrapper": "@nativescript/plugin-seed"
+}

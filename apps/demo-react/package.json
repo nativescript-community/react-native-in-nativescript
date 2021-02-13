@@ -1,0 +1,28 @@
+{
+    "main": "app.js",
+    "scripts": {
+        "typings:ios": "TNS_TYPESCRIPT_DECLARATIONS_PATH=\"$(pwd)/app/typings\" tns build ios"
+    },
+    "dependencies": {
+        "@nativescript/core": "file:../../node_modules/@nativescript/core",
+        "@nativescript-community/react-native": "file:../../packages/react-native",
+        "@react-navigation/core": "file:../../node_modules/@react-navigation/core",
+        "react": "file:../../node_modules/react",
+        "react-native": "file:../../node_modules/react-native",
+        "react-nativescript": "file:../../node_modules/react-nativescript",
+        "react-nativescript-navigation": "file:../../node_modules/react-nativescript-navigation"
+    },
+    "devDependencies": {
+        "@babel/core": "file:../../node_modules/@babel/core",
+        "@nativescript/android": "7.0.1",
+        "@nativescript/ios": "7.2.0",
+        "@nativescript/types": "file:../../node_modules/@nativescript/types",
+        "@nativescript/webpack": "4.0.1",
+        "@pmmmwh/react-refresh-webpack-plugin": "file:../../node_modules/@pmmmwh/react-refresh-webpack-plugin",
+        "@types/react": "file:../../node_modules/@types/react",
+        "babel-loader": "file:../../node_modules/babel-loader",
+        "fork-ts-checker-webpack-plugin": "file:../../node_modules/fork-ts-checker-webpack-plugin",
+        "react-refresh": "file:../../node_modules/react-refresh",
+        "typescript": "file:../../node_modules/typescript"
+    }
+}
