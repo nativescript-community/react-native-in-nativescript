@@ -41,8 +41,7 @@ function makeDistinctNativeViewIos(size: CGSize): RCTView {
     return rctView;
 }
 
-function onTest1Tap(args: EventData, canvas: StackLayout|undefined): void {
-    console.log(`Got canvas:`, canvas);
+function onTest1Tap(canvas: StackLayout|undefined): void {
     if(!canvas){
         return; // View hasn't mounted yet (somehow).
     }
@@ -64,7 +63,7 @@ function onTest1Tap(args: EventData, canvas: StackLayout|undefined): void {
 
     const rctView = makeDistinctNativeViewIos(canvasNativeView.bounds.size);
     canvasNativeView.addSubview(rctView);
-    console.log(canvasNativeView.subviews);
+    console.log("Inserting:", rctView);
 }
 
 function cleanUp(): void {
@@ -91,7 +90,7 @@ export function UIScreen({ navigation }: UIScreenProps){
         >
             <button
                 style={styles.button}
-                onTap={(args: EventData) => onTest1Tap(args, canvasRef.current?.nativeView ?? void 0)}
+                onTap={(args: EventData) => onTest1Tap(canvasRef.current?.nativeView ?? void 0)}
             >
                 Insert native view
             </button>
