@@ -9,14 +9,14 @@
 
 ===
 
-# @nativescript/\* plugins
+# @nativescript-community/\* plugins
 
 ```
 npm run setup
 npm start
 ```
 
-- @nativescript/react-native
+- @nativescript-community/react-native
 
 # How to use?
 
