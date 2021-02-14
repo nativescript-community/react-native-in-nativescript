@@ -117,8 +117,25 @@ class Order {
 }
 
 // Ultimately extends CustomLayoutView, which implements createNativeView(), > ContainerView > View
+/**
+  * @see https://reactnative.dev/docs/0.62/communication-ios for more end-to-end docs.
+  * Seems we need to have an RCTRootView above us.
+  */
 export class RNLayout extends RNLayoutBase {
 	// Omit divider
+
+	/**
+	 * ShadowView tree mirrors RCT view tree. Every node is highly stateful.
+	 * 1. A node is in one of three lifecycles: uninitialized, computed, dirtied.
+	 * 1. RCTBridge may call any of the padding/margin/width/height/top/left setters. A setter would dirty
+	 *    the node and all of its ancestors.
+	 * 2. At the end of each Bridge transaction, we call layoutWithMinimumSize:maximumSize:layoutDirection:layoutContext
+	 *    at the root node to recursively lay out the entire hierarchy.
+	 * 3. If a node is "computed" and the constraint passed from above is identical to the constraint used to
+	 *    perform the last computation, we skip laying out the subtree entirely.
+	 * @see https://github.com/facebook/react-native/blob/0f4f91766339f2cf4189446d7d575493d33b4009/React/Views/RCTShadowView.h#L30
+	 */
+	public readonly shadowView: RCTShadowView = new RCTShadowView();
 
 	private _reorderedIndices: number[];
 
@@ -127,33 +144,130 @@ export class RNLayout extends RNLayoutBase {
 	private _childrenFrozen: boolean[];
 	private measureContext: MeasureContext;
 
+	public _addViewToNativeVisualTree(child: View, atIndex: number): boolean {
+		const result = super._addViewToNativeVisualTree(child, atIndex);
+
+		if(!(child instanceof RNLayout)){
+			throw new Error(`RNLayout can only accept other RNLayouts as children. Was unexpectedly passed: ${child}`);
+		}
+
+		this.shadowView.insertReactSubviewAtIndex(child.shadowView, atIndex);
+
+
+		return result;
+	}
+
+	public _removeViewFromNativeVisualTree(child: View): void {
+		const result = super._removeViewFromNativeVisualTree(child);
+
+		if(!(child instanceof RNLayout)){
+			throw new Error(`RNLayout can only accept other RNLayouts as children. Was unexpectedly passed: ${child}`);
+		}
+
+		this.shadowView.removeReactSubview(child.shadowView);
+
+		return result;
+	}
+
+	// private _measureHorizontal(widthMeasureSpec: number, heightMeasureSpec: number): void {
+	// 	const widthSize = getMeasureSpecSize(widthMeasureSpec);
+	// 	const widthMode = getMeasureSpecMode(widthMeasureSpec);
+	// 	const heightSize = getMeasureSpecSize(heightMeasureSpec);
+	// 	const heightMode = getMeasureSpecMode(heightMeasureSpec);
+	// }
+
+	// private _measureVertical(widthMeasureSpec, heightMeasureSpec): void {
+	// 	const widthSize = getMeasureSpecSize(widthMeasureSpec);
+	// 	const widthMode = getMeasureSpecMode(widthMeasureSpec);
+	// 	const heightSize = getMeasureSpecSize(heightMeasureSpec);
+	// 	const heightMode = getMeasureSpecMode(heightMeasureSpec);
+	// }
+
+	/**
+	 * User Interface Layout Process:
+	 * @see https://docs.nativescript.org/ui/layouts/layouts
+	 * 
+	 * During the measure pass, each View is measured to retrieve its desired size.
+	 * The measure pass evaluates the following properties:
+	 * 
+	 * width
+	 * height
+	 * minWidth
+	 * minHeight
+	 * visibility
+	 * marginTop
+	 * marginRight
+	 * marginBottom
+	 * marginLeft
+	 */
 	public onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void {
 		this.measureContext = new MeasureContext(this);
 		// Omit: super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-		if (this._isOrderChangedFromLastMeasurement) {
-			this._reorderedIndices = this._createReorderedIndices();
-		}
-		if (!this._childrenFrozen || this._childrenFrozen.length < this.measureContext.childrenCount) {
-			this._childrenFrozen = new Array(this.measureContext.childrenCount);
-		}
+		// if (this._isOrderChangedFromLastMeasurement) {
+		// 	this._reorderedIndices = this._createReorderedIndices();
+		// }
+		// if (!this._childrenFrozen || this._childrenFrozen.length < this.measureContext.childrenCount) {
+		// 	this._childrenFrozen = new Array(this.measureContext.childrenCount);
+		// }
 
-		switch (this.flexDirection) {
-			case FlexDirection.ROW:
-			case FlexDirection.ROW_REVERSE:
-				this._measureHorizontal(widthMeasureSpec, heightMeasureSpec);
-				break;
-			case FlexDirection.COLUMN:
-			case FlexDirection.COLUMN_REVERSE:
-				this._measureVertical(widthMeasureSpec, heightMeasureSpec);
-				break;
-			default:
-				throw new Error('Invalid value for the flex direction is set: ' + this.flexDirection);
-		}
+		// switch (this.flexDirection) {
+		// 	case FlexDirection.ROW:
+		// 	case FlexDirection.ROW_REVERSE:
+		// 		this._measureHorizontal(widthMeasureSpec, heightMeasureSpec);
+		// 		break;
+		// 	case FlexDirection.COLUMN:
+		// 	case FlexDirection.COLUMN_REVERSE:
+		// 		this._measureVertical(widthMeasureSpec, heightMeasureSpec);
+		// 		break;
+		// 	default:
+		// 		throw new Error('Invalid value for the flex direction is set: ' + this.flexDirection);
+		// }
 
-		this._childrenFrozen.length = 0;
+		// this._childrenFrozen.length = 0;
+
+
+		const widthSize = getMeasureSpecSize(widthMeasureSpec);
+		const heightSize = getMeasureSpecSize(heightMeasureSpec);
+
+		// Could be EXACTLY, AT_MOST, or unspecified. Not sure what to do with them.
+		const widthMode = getMeasureSpecMode(widthMeasureSpec);
+		const heightMode = getMeasureSpecMode(heightMeasureSpec);
+
+		const minimumSize = CGSizeMake(widthSize, heightSize);
+		const maximumSize = CGSizeMake(widthSize, heightSize);
+
+		const isRtl = this.flexDirection === FlexDirection.ROW_REVERSE;
+
+		
+		this.shadowView.layoutWithMinimumSizeMaximumSizeLayoutDirectionLayoutContext(
+			minimumSize,
+			maximumSize,
+			isRtl ? UIUserInterfaceLayoutDirection.RightToLeft : UIUserInterfaceLayoutDirection.LeftToRight,
+			{
+				absolutePosition: CGPointMake(0, 0),
+				// affectedShadowViews: this.shadowView.reactSubviews()
+				affectedShadowViews: (NSHashTable.alloc().init() as NSHashTable<RCTShadowView>),
+				other: (NSHashTable.alloc().init() as NSHashTable<string>),
+			},
+		);
 	}
 
+	/**
+	 * User Interface Layout Process:
+	 * @see https://docs.nativescript.org/ui/layouts/layouts
+	 * 
+	 * During the layout pass, each View is placed in a specific layout slot.
+	 * This slot is determined by the desired size of the view (retrieved from the
+	 * measure pass) and the following properties:
+	 * 
+	 * marginTop
+	 * marginRight
+	 * marginBottom
+	 * marginLeft
+	 * horizontalAlignment
+	 * verticalAlignment
+	 */
 	public onLayout(left: number, top: number, right: number, bottom: number) {
 		const insets = this.getSafeAreaInsets();
 
