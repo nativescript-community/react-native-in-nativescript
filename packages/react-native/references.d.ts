@@ -19,3 +19,5 @@
 /// <reference path="./typings/objc!jsinspector.d.ts" />
 /// <reference path="./typings/objc!jsireact.d.ts" />
 /// <reference path="./typings/objc!yoga.d.ts" />
+/// <reference types="@nativescript/types-android" />
+/// <reference types="@nativescript/types-ios" />
