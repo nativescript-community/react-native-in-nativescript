@@ -46,7 +46,7 @@ export type { RNAlignSelf };
  * Android mentioned shadow views too. So that's probably the thing to implement.
  * @see RCTShadowView
  */
-export class RNFlexboxLayout extends FlexboxLayout {
+export class RNLayout extends FlexboxLayout {
 	public static setFlexGrow(view: View, grow: number);
 	public static getFlexGrow(view: View);
 
