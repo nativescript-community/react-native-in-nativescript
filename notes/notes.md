@@ -1,0 +1,1 @@
+* [ReactNativeViewViewConfig](https://github.com/facebook/react-native/blob/0f4f91766339f2cf4189446d7d575493d33b4009/Libraries/Components/View/ReactNativeViewViewConfig.js) defines the `ViewConfig` type, which includes all attributes
