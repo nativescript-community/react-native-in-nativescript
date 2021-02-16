@@ -1,5 +1,8 @@
 {
 	"main": "main.js",
+    "scripts": {
+        "haul": "haul start"
+    },
 	"dependencies": {
 		"@angular/animations": "file:../../node_modules/@angular/animations",
 		"@angular/common": "file:../../node_modules/@angular/common",
@@ -20,7 +23,9 @@
 	},
 	"devDependencies": {
 		"@angular/compiler-cli": "file:../../node_modules/@angular/compiler-cli",
-		"@haul-bundler/cli": "file:../../node_modules/@haul-bundler/cli",
+		"@haul-bundler/babel-preset-react-native": "file:../../node_modules/@haul-bundler/babel-preset-react-native",
+        "@haul-bundler/cli": "file:../../node_modules/@haul-bundler/cli",
+		"@haul-bundler/preset-0.60": "file:../../node_modules/@haul-bundler/preset-0.60",
         "@nativescript/android": "7.0.1",
         "@nativescript/ios": "7.2.0",
 		"@nativescript/webpack": "~3.0.0",

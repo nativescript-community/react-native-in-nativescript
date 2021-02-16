@@ -10,6 +10,9 @@ platforms/
 # React NativeScript
 !webpack.config.js
 
+# React Native support
+!babel.config.js
+
 # Logs
 logs
 *.log

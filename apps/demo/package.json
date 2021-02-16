@@ -3,6 +3,9 @@
 	"description": "NativeScript Application",
 	"license": "SEE LICENSE IN <your-license-filename>",
 	"repository": "<fill-your-repository-here>",
+    "scripts": {
+        "haul": "haul start"
+    },
 	"dependencies": {
 		"nativescript-theme-core": "file:../../node_modules/nativescript-theme-core",
 		"@nativescript/core": "file:../../node_modules/@nativescript/core",
@@ -13,7 +16,9 @@
         "@nativescript/android": "7.0.1",
         "@nativescript/ios": "7.2.0",
 		"@nativescript/webpack": "~3.0.0",
-		"@haul-bundler/cli": "file:../../node_modules/@haul-bundler/cli",
+		"@haul-bundler/babel-preset-react-native": "file:../../node_modules/@haul-bundler/babel-preset-react-native",
+        "@haul-bundler/cli": "file:../../node_modules/@haul-bundler/cli",
+		"@haul-bundler/preset-0.60": "file:../../node_modules/@haul-bundler/preset-0.60",
 		"typescript": "file:../../node_modules/typescript"
 	}
 }

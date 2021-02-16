@@ -1,6 +1,7 @@
 {
     "main": "app.js",
     "scripts": {
+        "haul": "haul start",
         "typings:ios": "TNS_TYPESCRIPT_DECLARATIONS_PATH=\"$(pwd)/app/typings\" tns build ios"
     },
     "dependencies": {
@@ -14,7 +15,9 @@
     },
     "devDependencies": {
         "@babel/core": "file:../../node_modules/@babel/core",
+        "@haul-bundler/babel-preset-react-native": "file:../../node_modules/@haul-bundler/babel-preset-react-native",
         "@haul-bundler/cli": "file:../../node_modules/@haul-bundler/cli",
+        "@haul-bundler/preset-0.60": "file:../../node_modules/@haul-bundler/preset-0.60",
         "@nativescript/android": "7.0.1",
         "@nativescript/ios": "7.2.0",
         "@nativescript/types": "file:../../node_modules/@nativescript/types",
