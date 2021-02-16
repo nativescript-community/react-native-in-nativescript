@@ -268,37 +268,37 @@ export class RNLayout extends RNLayoutBase {
 	 * horizontalAlignment
 	 * verticalAlignment
 	 */
-	public onLayout(left: number, top: number, right: number, bottom: number) {
-		const insets = this.getSafeAreaInsets();
+	// public onLayout(left: number, top: number, right: number, bottom: number) {
+	// 	const insets = this.getSafeAreaInsets();
 
-		let isRtl;
-		switch (this.flexDirection) {
-			case FlexDirection.ROW:
-				isRtl = false;
-				this._layoutHorizontal(isRtl, left, top, right, bottom, insets);
-				break;
-			case FlexDirection.ROW_REVERSE:
-				isRtl = true;
-				this._layoutHorizontal(isRtl, left, top, right, bottom, insets);
-				break;
-			case FlexDirection.COLUMN:
-				isRtl = false;
-				if (this.flexWrap === FlexWrap.WRAP_REVERSE) {
-					isRtl = !isRtl;
-				}
-				this._layoutVertical(isRtl, false, left, top, right, bottom, insets);
-				break;
-			case FlexDirection.COLUMN_REVERSE:
-				isRtl = false;
-				if (this.flexWrap === FlexWrap.WRAP_REVERSE) {
-					isRtl = !isRtl;
-				}
-				this._layoutVertical(isRtl, true, left, top, right, bottom, insets);
-				break;
-			default:
-				throw new Error('Invalid flex direction is set: ' + this.flexDirection);
-		}
-	}
+	// 	let isRtl;
+	// 	switch (this.flexDirection) {
+	// 		case FlexDirection.ROW:
+	// 			isRtl = false;
+	// 			this._layoutHorizontal(isRtl, left, top, right, bottom, insets);
+	// 			break;
+	// 		case FlexDirection.ROW_REVERSE:
+	// 			isRtl = true;
+	// 			this._layoutHorizontal(isRtl, left, top, right, bottom, insets);
+	// 			break;
+	// 		case FlexDirection.COLUMN:
+	// 			isRtl = false;
+	// 			if (this.flexWrap === FlexWrap.WRAP_REVERSE) {
+	// 				isRtl = !isRtl;
+	// 			}
+	// 			this._layoutVertical(isRtl, false, left, top, right, bottom, insets);
+	// 			break;
+	// 		case FlexDirection.COLUMN_REVERSE:
+	// 			isRtl = false;
+	// 			if (this.flexWrap === FlexWrap.WRAP_REVERSE) {
+	// 				isRtl = !isRtl;
+	// 			}
+	// 			this._layoutVertical(isRtl, true, left, top, right, bottom, insets);
+	// 			break;
+	// 		default:
+	// 			throw new Error('Invalid flex direction is set: ' + this.flexDirection);
+	// 	}
+	// }
 }
 
 export namespace FlexboxLayout {
