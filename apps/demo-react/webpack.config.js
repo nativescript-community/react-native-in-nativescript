@@ -91,7 +91,7 @@ module.exports = (env) => {
          */
         bundleOutput,
         sourceMapFilename: baseConfig.output.sourceMapFilename,
-        port, // Undocumented, but let's treat it as ProjectConfig["server"]["port"].
+        port, // Treating it as ProjectConfig["server"]["port"]; I think it's used only by the `haul reload` CLI command.
     };
 
     /**
