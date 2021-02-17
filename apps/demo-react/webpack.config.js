@@ -33,8 +33,6 @@ module.exports = (env) => {
         // entry.bundle: "./app.ts"
         output,
     } = baseConfig;
-    const projectRoot = __dirname;
-    const appResourcesFullPath = resolve(projectRoot, env.appResourcesPath || "App_Resources");
     const platform = env && (env.android && "android" || env.ios && "ios" || env.platform);
 
     const port = 8081;
@@ -46,29 +44,10 @@ module.exports = (env) => {
         platform,
         root: baseConfig.context,
         /**
-         * I'm not totally sure about assetsDest, but here's what I can find out:
-         * 
-         * "Directory name where to store bundles and assets referenced in the bundle."
-         * @see https://github.com/callstack/haul/blob/0747fd41b94603900c8759511ca18f7c9e2e03ee/packages/ haul-cli/src/commands/multiBundle.ts
-         * "Directory name where to store assets referenced in the bundle."
-         * @see https://github.com/callstack/haul/blob/0747fd41b94603900c8759511ca18f7c9e2e03ee/packages/ haul-cli/src/commands/bundle.ts
-         * @default (assetsDest || bundleOutput || "") I think is how it's generally consumed.
-         * @example build/assets
-         * @example dist/ios/dev
-         * @example dist/ios/prod
-         * @example dist/non-min/ios
-         * @example dist/non-min/android
-         * @example dist/min/ios
-         * @example dist/min/android
-         * @example dist/external/ios
-         * @example dist/external/android
-         * @example windows/RNWTestApp/Bundle
-         * @see https://github.com/callstack/haul/blob/0747fd41b94603900c8759511ca18f7c9e2e03ee/packages/ haul-core-legacy/src/compiler/worker/runWebpackCompiler.js
-         * I've seen a test expect something to get copied to this location:
-         *   'host/dist/ios/dev/assets/node_modules/react-navigation-stack/lib/module/views/assets/ back-icon.png'
-         * @see https://github.com/callstack/haul/blob/0747fd41b94603900c8759511ca18f7c9e2e03ee/e2e/ monorepo_multibundle/__tests__/monorepo.test.ts
+         * The examples in this section suggest it to be the same directory as bundleOutput, which I believe mirrors the NativeScript
+         * runtime's working directory structure (require() calls are clearly resolved relative to that directory).
+         * @see https://github.com/callstack/haul/blob/0747fd41b94603900c8759511ca18f7c9e2e03ee/docs/CLI%20Commands.md#haul-bundle
          */
-        // assetsDest: appResourcesFullPath, // Unlikely to be correct.
         assetsDest: bundleOutput,
         dev: !env.production,
         minify: !!env.uglify,
