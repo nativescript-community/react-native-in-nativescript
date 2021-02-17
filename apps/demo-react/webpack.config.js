@@ -4,6 +4,7 @@
  */
 const webpackConfig = require("./webpack.typescript");
 const webpack = require("webpack");
+const path = require("path");
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const {
     AssetResolver,
@@ -34,6 +35,7 @@ module.exports = (env) => {
         output,
     } = baseConfig;
     const platform = env && (env.android && "android" || env.ios && "ios" || env.platform);
+    const projectRoot = __dirname;
 
     const port = 8081;
 
@@ -42,6 +44,11 @@ module.exports = (env) => {
     /** @type {import("@haul-bundler/core").EnvOptions} */
     const haulEnv = {
         platform,
+        /**
+         * This one's a bit problematic. Sometimes it makes more sense to pass the "src" directory (e.g. for loading assets), and
+         * sometimes it makes more sense to pass the project root. Either way, you end up having to correct the generated config in
+         * one place or another. I'll go with the build context and then make corrections as necessary.
+         */
         root: baseConfig.context,
         /**
          * The examples in this section suggest it to be the same directory as bundleOutput, which I believe mirrors the NativeScript
@@ -73,6 +80,8 @@ module.exports = (env) => {
         port, // Treating it as ProjectConfig["server"]["port"]; I think it's used only by the `haul reload` CLI command.
     };
 
+    const bundleName = "index";
+
     /**
       * @see https://github.com/callstack/haul/blob/0747fd41b94603900c8759511ca18f7c9e2e03ee/docs/Configuration.md#project-configuration-reference
       * @see https://github.com/callstack/haul/blob/master/packages/haul-preset-0.60/src/defaultConfig.ts
@@ -89,7 +98,7 @@ module.exports = (env) => {
             android: '[bundleName].[platform].bundle',
         },
         bundles: {
-            index: {
+            [bundleName]: {
                 entry: withPolyfills(baseConfig.entry.bundle),
                 platform: haulEnv.platform,
                 root: haulEnv.root,
@@ -110,10 +119,27 @@ module.exports = (env) => {
 
     const {
         entry: haulConfigEntryFiles,
-        module: haulConfigModule,
+        webpackConfigs: {
+            [bundleName]: haulWebpackConfig,
+        },
     } = haulConfig;
+    const haulTsxRule = haulWebpackConfig.module.rules[1];
+    // It was looking for "babel.config.js" relative to src, so we fix that here.
+    haulTsxRule.use[0].options.extends = getBabelConfigPath(projectRoot);
+    // It was placing the cache directory in "src/node_modules" rather than node_modules, so we fix that here.
+    haulTsxRule.use[0].options.cacheDirectory = production ?
+        false :
+        path.join(
+            projectRoot,
+            'node_modules',
+            '.cache',
+            'babel-loader',
+            platform,
+        );
 
-    console.log(haulConfig);
+    require('util').inspect.defaultOptions.depth = 7;
+
+    console.log("haulWebpackConfig:", haulWebpackConfig);
 
     if(useReactNative){
         baseConfig.entry = {
@@ -123,7 +149,7 @@ module.exports = (env) => {
             bundle: haulConfigEntryFiles,
         };
 
-        const parserRule = haulConfigModule.rules[0];
+        const parserRule = haulWebpackConfig.module.rules[0];
         baseConfig.module.rules.splice(0, 0, parserRule);
     }
 
@@ -131,12 +157,17 @@ module.exports = (env) => {
     const tsxRule = baseConfig.module.rules.find(rule => rule.use && rule.use.loader === "ts-loader");
 
     if(useReactNative){
-        const haulTsxRule = haulConfigModule.rules[1];
-
+        console.log("haulTsxRule", haulTsxRule);
         tsxRule.test = haulTsxRule.test;
         tsxRule.exclude = haulTsxRule.exclude;
 
-        console.log(haulTsxRule);
+        /*
+         * In the RNS rule, we stick with ts-loader, and add in babel-loader just to support HMR.
+         * In the Haul rule, they use babelWorkerLoader, and extend the preset in babel.config.js:
+         *   module:@haul-bundler/babel-preset-react-native
+         * That seems to include a plugin "@babel/plugin-transform-typescript".
+         * What remains to be seen is whether passing it baseConfig.context or projectRoot makes more sense.
+         */
 
         process.exit(1);
 
