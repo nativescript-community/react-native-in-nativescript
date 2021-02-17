@@ -11,7 +11,8 @@ platforms/
 !webpack.config.js
 
 # React Native support
-!babel.config.js
+!/babel.config.js
+!/haul.config.js
 
 # Logs
 logs
