@@ -27,18 +27,14 @@ module.exports = (env) => {
     const isAnySourceMapEnabled = !!env.sourceMap || !!env.hiddenSourceMap;
 
     const baseConfig = webpackConfig(env);
-
-    const {
-        // "/Users/jamie/Documents/git/react-native-in-nativescript/apps/demo-react/src"
-        context,
-        // entry.bundle: "./app.ts"
-        output,
-    } = baseConfig;
     const platform = env && (env.android && "android" || env.ios && "ios" || env.platform);
     const projectRoot = __dirname;
 
     const port = 8081;
 
+    /**
+     * @example "/Users/jamie/Documents/git/react-native-in-nativescript/apps/demo-react/platforms/ios/demoreact/app"
+     */
     const bundleOutput = baseConfig.output.path;
 
     /** @type {import("@haul-bundler/core").EnvOptions} */
@@ -48,6 +44,8 @@ module.exports = (env) => {
          * This one's a bit problematic. Sometimes it makes more sense to pass the "src" directory (e.g. for loading assets), and
          * sometimes it makes more sense to pass the project root. Either way, you end up having to correct the generated config in
          * one place or another. I'll go with the build context and then make corrections as necessary.
+         * baseConfig.context is the src folder:
+         * @example "/Users/jamie/Documents/git/react-native-in-nativescript/apps/demo-react/src"
          */
         root: baseConfig.context,
         /**
@@ -151,6 +149,8 @@ module.exports = (env) => {
 
         const parserRule = haulWebpackConfig.module.rules[0];
         baseConfig.module.rules.splice(0, 0, parserRule);
+
+        // There's also an asset loader, but let's see how well things go just with NativeScript's existing one first.
     }
 
     /** Find the rule for transpiling ts files ("ts-loader"), and modify it to test for .tsx files too. */
@@ -179,7 +179,7 @@ module.exports = (env) => {
          * by haul's Babel setup.
          */
         const nativeScriptSourcesDir = "nativescript-src";
-        tsxRule.include = path.resolve(context, nativeScriptSourcesDir);
+        tsxRule.include = path.resolve(baseConfig.context, nativeScriptSourcesDir);
 
         /**
          * In the RNS rule, we stick with ts-loader, and add in babel-loader just to support HMR.
@@ -211,8 +211,6 @@ module.exports = (env) => {
          * Beyond proof-of-concept, we could make a rule that any files under src/nativescript get processed with ts-loader,
          */
         baseConfig.module.rules.push(haulTsxRule);
-
-        process.exit(1);
     }
 
     /**
@@ -224,8 +222,17 @@ module.exports = (env) => {
     );
     nativeScriptDevWebpackHotLoader.test = /\.(ts|tsx|js|css|scss|html|xml)$/;
 
-    /** We don't officially support JSX. Makes the webpack config rather more complicated to set up. */
-    baseConfig.resolve.extensions = [".tsx", ...baseConfig.resolve.extensions];
+    if(useReactNative){
+        /** CaseSensitivePathsPlugin */
+        baseConfig.plugins.splice(0, 0, haulWebpackConfig.plugins[0]);
+    }
+
+    baseConfig.resolve.extensions = [
+        ".tsx",
+        /** We don't officially support JSX. Makes the webpack config rather more complicated to set up. */
+        ...(useReactNative ? [".jsx"] : []),
+        ...baseConfig.resolve.extensions
+    ];
     if(!useReactNative){
         baseConfig.resolve.alias["react-dom"] = "react-nativescript";
     }
@@ -234,11 +241,15 @@ module.exports = (env) => {
     const existingDefinePlugin = baseConfig.plugins.find(plugin =>
         plugin && plugin.constructor && plugin.constructor.name === "DefinePlugin"
     );
+    const haulDefinePlugin = haulWebpackConfig.plugins.find(plugin =>
+        plugin && plugin.constructor && plugin.constructor.name === "DefinePlugin"
+    );
     baseConfig.plugins.splice(
         baseConfig.plugins.indexOf(existingDefinePlugin),
         1,
         new webpack.DefinePlugin({
             ...existingDefinePlugin.definitions,
+            ...(useReactNative ? haulDefinePlugin.definitions : []),
             /** For various libraries in the React ecosystem. */
             "__DEV__": production ? "false" : "true",
             "__TEST__": "false",
@@ -249,6 +260,27 @@ module.exports = (env) => {
             "process.env.NODE_ENV": JSON.stringify(production ? "production" : "development"),
         }),
     );
+
+    if(useReactNative){
+        baseConfig.plugins.splice(
+            2,
+            0,
+            /** LoaderOptionsPlugin */
+            haulWebpackConfig.plugins[2],
+            /** LimitChunkCountPlugin */
+            haulWebpackConfig.plugins[3],
+            /** SourceMapDevToolPlugin */
+            haulWebpackConfig.plugins[4],
+            /** BasicBundleWebpackPlugin */
+            haulWebpackConfig.plugins[5],
+        );
+
+        baseConfig.resolve.plugins = haulWebpackConfig.resolve.plugins;
+        baseConfig.optimization.namedModules = true;
+        baseConfig.optimization.concatenatedModules = true;
+        baseConfig.target = "webworker";
+        baseConfig.stats = "verbose";
+    }
 
     if(hmr && !production){
         baseConfig.plugins.push(new ReactRefreshWebpackPlugin({
