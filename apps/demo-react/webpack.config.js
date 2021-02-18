@@ -155,43 +155,64 @@ module.exports = (env) => {
 
     /** Find the rule for transpiling ts files ("ts-loader"), and modify it to test for .tsx files too. */
     const tsxRule = baseConfig.module.rules.find(rule => rule.use && rule.use.loader === "ts-loader");
+    tsxRule.test = /\.(ts|tsx)$/;
+    tsxRule.use = [
+        /**
+         * Add React Refresh HMR support.
+         * @see https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/55028c6355b31e697e21bf3e9a48613a7b94bee7/examples/typescript-without-babel/webpack.config.js#L18-L21
+         */
+        hmr && !production && {
+            loader: "babel-loader",
+            options: {
+                sourceMaps: isAnySourceMapEnabled ? "inline" : false,
+                babelrc: false,
+                plugins: ['react-refresh/babel']
+            }
+        },
+        tsxRule.use,
+    ].filter(Boolean);
 
     if(useReactNative){
         console.log("haulTsxRule", haulTsxRule);
-        tsxRule.test = haulTsxRule.test;
-        tsxRule.exclude = haulTsxRule.exclude;
+        /**
+         * As a "better-than-nothing" effort, any file under nativescript-src gets processed by our ts-loader setup rather than
+         * by haul's Babel setup.
+         */
+        const nativeScriptSourcesDir = "nativescript-src";
+        tsxRule.include = path.resolve(context, nativeScriptSourcesDir);
 
-        /*
+        /**
          * In the RNS rule, we stick with ts-loader, and add in babel-loader just to support HMR.
          * In the Haul rule, they use babelWorkerLoader, and extend the preset in babel.config.js:
          *   module:@haul-bundler/babel-preset-react-native
          * That seems to include a plugin "@babel/plugin-transform-typescript".
          * What remains to be seen is whether passing it baseConfig.context or projectRoot makes more sense.
+         * 
+         * Between ts-loader and our tsconfig.json, we're missing a few key features in @babel/plugin-transform-typescript.
+         * 
+         * --experimentalDecorators: @babel/plugin-proposal-decorators exists, but let's just not use decorators in userland
+         *                           for now.
+         * --emitDecoratorMetadata:  https://github.com/leonardfactory/babel-plugin-transform-typescript-metadata exists, but
+         *                           let's just not use decorators in userland for now.
+         * @nativescript/webpack/transformers/ns-transform-native-classes transformer: Unsupported. Let's not use @NativeClass
+         *                           in userland for now. @nativescript/core doesn't distribute any mentions of it in the
+         *                           built code, so we'll be fine.
+         * Path aliases:             In user code, let's stop using alias imports (e.g. "~/*": "./src/*") to keep things simple.
+         *                           However, it does appear that "~" is already aliased by the baseConfig to mean the app's full path.
+         *                           So I'm not even sure whether that's in conflict to begin with.
+         *                           There are some paths to our monorepo package srcs, but I think those are only used by the
+         *                           monorepo's package-by-package build commands, not the demo build commands.
+         * rootDirs:                 Only matters at editing-time and type-checking time, so should be fine.
+         * `target: es2017`:         I'm not clear what haul is targeting. I suspect we'll be fine without changing anything.
+         * --allowTsInNodeModules    I think it's a mistake that this is in there to begin with. @nativescript/core only
+         *                           distributes .js and .d.ts, so we should be fine.
+         * sourceMap:                No idea how this will go, but we've specified a source map filename to haul!
+         * 
+         * Beyond proof-of-concept, we could make a rule that any files under src/nativescript get processed with ts-loader,
          */
+        baseConfig.module.rules.push(haulTsxRule);
 
         process.exit(1);
-
-        tsxRule.use = [
-
-            tsxRule.use,
-        ].filter(Boolean);
-    } else {
-        tsxRule.test = /\.(ts|tsx)$/;
-        tsxRule.use = [
-            /**
-             * Add React Refresh HMR support.
-             * @see https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/55028c6355b31e697e21bf3e9a48613a7b94bee7/examples/typescript-without-babel/webpack.config.js#L18-L21
-             */
-            hmr && !production && {
-                loader: "babel-loader",
-                options: {
-                    sourceMaps: isAnySourceMapEnabled ? "inline" : false,
-                    babelrc: false,
-                    plugins: ['react-refresh/babel']
-                }
-            },
-            tsxRule.use,
-        ].filter(Boolean);
     }
 
     /**
@@ -205,7 +226,9 @@ module.exports = (env) => {
 
     /** We don't officially support JSX. Makes the webpack config rather more complicated to set up. */
     baseConfig.resolve.extensions = [".tsx", ...baseConfig.resolve.extensions];
-    baseConfig.resolve.alias["react-dom"] = "react-nativescript";
+    if(!useReactNative){
+        baseConfig.resolve.alias["react-dom"] = "react-nativescript";
+    }
 
     /** Augment NativeScript's existing DefinePlugin definitions with a few more of our own. */
     const existingDefinePlugin = baseConfig.plugins.find(plugin =>
