@@ -220,7 +220,7 @@ module.exports = (env) => {
     const nativeScriptDevWebpackHotLoader = baseConfig.module.rules.find(rule =>
         rule.use === "@nativescript/webpack/hmr/hot-loader"
     );
-    nativeScriptDevWebpackHotLoader.test = /\.(ts|tsx|js|css|scss|html|xml)$/;
+    nativeScriptDevWebpackHotLoader.test = useReactNative ? /\.(ts|tsx|jsx|js|css|scss|html|xml)$/ : /\.(ts|tsx|js|css|scss|html|xml)$/;
 
     if(useReactNative){
         /** CaseSensitivePathsPlugin */
