@@ -5,6 +5,7 @@ import { MainStackParamList } from "./NavigationParamList";
 import type { ItemEventData } from "@nativescript/core";
 import { ListView, StyleSheet } from "react-nativescript";
 import { Dialogs, isAndroid, isIOS } from "@nativescript/core";
+import { View } from "react-native";
 
 type BasicScreenProps = {
     route: RouteProp<MainStackParamList, "basic">,
@@ -37,6 +38,12 @@ const items: MyItem[] = [
                 return;
             }
             console.log(`Unimplemented platform!`);
+        },
+    },
+    {
+        label: `Use React Native`,
+        callback: () => {
+            console.log(`Here is a React Native <View>`, View);
         },
     },
 ];
