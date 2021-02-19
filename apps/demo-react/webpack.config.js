@@ -190,8 +190,19 @@ module.exports = (env) => {
          * As a "better-than-nothing" effort, any file under nativescript-src gets processed by our ts-loader setup rather than
          * by haul's Babel setup.
          */
-        const nativeScriptSourcesDir = "nativescript-src";
-        tsxRule.include = path.resolve(baseConfig.context, nativeScriptSourcesDir);
+        const nativeScriptSourcesDir = "nativescript-compat";
+        const nativeScriptSourcesDirpath = path.resolve(baseConfig.context, nativeScriptSourcesDir);
+        tsxRule.include = nativeScriptSourcesDirpath;
+
+        /**
+         * Originally this:
+         * /node_modules(?!.*[\/\\](react|@react-navigation|@react-native-community|@expo|pretty-format|@haul-bundler|metro))/
+         * I've added in @nativescript and @nativescript-community.
+         */
+        haulTsxRule.exclude = [
+            haulTsxRule.exclude,
+            nativeScriptSourcesDirpath,
+        ];
 
         /**
          * In the RNS rule, we stick with ts-loader, and add in babel-loader just to support HMR.
@@ -289,7 +300,7 @@ module.exports = (env) => {
 
         baseConfig.resolve.plugins = haulWebpackConfig.resolve.plugins;
         baseConfig.optimization.namedModules = true;
-        baseConfig.optimization.concatenateModules = true;
+        baseConfig.optimization.concatenateModules = false; // true is complaining a lot about ESM
         baseConfig.target = "webworker";
         baseConfig.stats = "verbose";
     }
