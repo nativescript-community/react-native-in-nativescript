@@ -122,6 +122,7 @@ module.exports = (env) => {
         },
     } = haulConfig;
     const haulTsxRule = haulWebpackConfig.module.rules[1];
+    const haulAssetRule = haulWebpackConfig.module.rules[2];
     // It was looking for "babel.config.js" relative to src, so we fix that here.
     haulTsxRule.use[0].options.extends = getBabelConfigPath(projectRoot);
     // It was placing the cache directory in "src/node_modules" rather than node_modules, so we fix that here.
@@ -234,6 +235,10 @@ module.exports = (env) => {
          * Beyond proof-of-concept, we could make a rule that any files under src/nativescript get processed with ts-loader,
          */
         baseConfig.module.rules.push(haulTsxRule);
+        const nativeScriptAssetsDirPath = path.resolve(baseConfig.context, "assets");
+        const nativeScriptFontsDirPath = path.resolve(baseConfig.context, "fonts");
+        haulAssetRule.exclude = [nativeScriptAssetsDirPath, nativeScriptFontsDirPath];
+        baseConfig.module.rules.push(haulAssetRule);
     }
 
     /**
