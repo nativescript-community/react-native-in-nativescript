@@ -137,14 +137,27 @@ module.exports = (env) => {
 
     require('util').inspect.defaultOptions.depth = 7;
 
-    console.log("haulWebpackConfig:", haulWebpackConfig);
-
     if(useReactNative){
+        /* baseConfig */
+        // entry: {
+        //     bundle: './app.ts',
+        //     'tns_modules/@nativescript/core/inspector_modules': 'inspector_modules'
+        // }
+
+        /* haul */
+        // entry: [
+        //     '/Users/jamie/Documents/git/react-native-in-nativescript/apps/demo-react/node_modules/react-native/Libraries/polyfills/console.js',
+        //     '/Users/jamie/Documents/git/react-native-in-nativescript/apps/demo-react/node_modules/react-native/Libraries/polyfills/error-guard.js',
+        //     '/Users/jamie/Documents/git/react-native-in-nativescript/apps/demo-react/node_modules/react-native/Libraries/polyfills/Object.es7.js',
+        //     'react-native/Libraries/Core/InitializeCore.js',
+        //     './app.ts'
+        // ]
+
         baseConfig.entry = {
             // No need to polyfill inspector_modules, to my understanding (whatever that is).
             ...baseConfig.entry,
             // Our app.ts gets polyfilled
-            bundle: haulConfigEntryFiles,
+            bundle: haulWebpackConfig.entry,
         };
 
         const parserRule = haulWebpackConfig.module.rules[0];
@@ -173,7 +186,6 @@ module.exports = (env) => {
     ].filter(Boolean);
 
     if(useReactNative){
-        console.log("haulTsxRule", haulTsxRule);
         /**
          * As a "better-than-nothing" effort, any file under nativescript-src gets processed by our ts-loader setup rather than
          * by haul's Babel setup.
@@ -277,10 +289,13 @@ module.exports = (env) => {
 
         baseConfig.resolve.plugins = haulWebpackConfig.resolve.plugins;
         baseConfig.optimization.namedModules = true;
-        baseConfig.optimization.concatenatedModules = true;
+        baseConfig.optimization.concatenateModules = true;
         baseConfig.target = "webworker";
         baseConfig.stats = "verbose";
     }
+
+    console.log("haulWebpackConfig:", haulWebpackConfig);
+    console.log("baseConfig:", baseConfig);
 
     if(hmr && !production){
         baseConfig.plugins.push(new ReactRefreshWebpackPlugin({
