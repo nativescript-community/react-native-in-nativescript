@@ -42,7 +42,7 @@
 		"nativescript-vue-template-compiler": "~2.8.0",
 		"ng-packagr": "~10.1.0",
 		"patch-package": "^6.2.2",
-		"react": "^16.13.1",
+		"react": "16.13.1",
 		"react-native": "0.63.4",
 		"react-nativescript": "^2.2.0",
 		"react-nativescript-navigation": "^2.0.1",
