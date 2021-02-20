@@ -27,6 +27,7 @@ module.exports = (env) => {
     const isAnySourceMapEnabled = !!env.sourceMap || !!env.hiddenSourceMap;
 
     const baseConfig = webpackConfig(env);
+    console.log(`baseConfig original`, baseConfig);
     const platform = env && (env.android && "android" || env.ios && "ios" || env.platform);
     const projectRoot = __dirname;
 
@@ -306,7 +307,11 @@ module.exports = (env) => {
         baseConfig.resolve.plugins = haulWebpackConfig.resolve.plugins;
         baseConfig.optimization.namedModules = true;
         baseConfig.optimization.concatenateModules = false; // true is complaining a lot about ESM
-        baseConfig.target = "webworker";
+        /**
+         * "webworker" gives us `TypeError: global.webpackChunk is not a function
+         * The original [Function: nativescriptTarget] seems important for NativeScript, anyway!.
+         */
+        // baseConfig.target = "webworker";
         baseConfig.stats = "verbose";
     }
 
