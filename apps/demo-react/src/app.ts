@@ -34,6 +34,9 @@ console.log(`App entrypoint!`);
  * 
  * So instead, we could just stop importing InitializeCore and instead import just the bits we need before setting up our AppDelegate.
  * 
+ * Turned out, this is because one of our entrypoints was InitializeCore.js! Just had to remove it.
+ * 
+ * Now it can't find ReactReconciler. That'll probably be because we need to use the exact same version of react that React Native uses.
  */
 
 ReactNativeScript.start(React.createElement(AppContainer, {}, null));

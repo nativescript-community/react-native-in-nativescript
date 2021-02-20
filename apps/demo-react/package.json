@@ -27,6 +27,7 @@
         "babel-loader": "file:../../node_modules/babel-loader",
         "fork-ts-checker-webpack-plugin": "file:../../node_modules/fork-ts-checker-webpack-plugin",
         "react-refresh": "file:../../node_modules/react-refresh",
-        "typescript": "file:../../node_modules/typescript"
+        "typescript": "file:../../node_modules/typescript",
+        "webpack-bundle-analyzer": "^4.4.0"
     }
 }

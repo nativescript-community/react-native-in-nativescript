@@ -4,6 +4,7 @@
  */
 const webpackConfig = require("./webpack.typescript");
 const webpack = require("webpack");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const path = require("path");
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const {
@@ -158,8 +159,8 @@ module.exports = (env) => {
         baseConfig.entry = {
             // No need to polyfill inspector_modules, to my understanding (whatever that is).
             ...baseConfig.entry,
-            // Our app.ts gets polyfilled
-            bundle: haulWebpackConfig.entry,
+            // Our app.ts gets polyfilled. We'll exclude InitializeCore.js because it's running too early.
+            bundle: haulWebpackConfig.entry.filter(entrypointFile => entrypointFile.indexOf("InitializeCore.js") === -1),
         };
 
         const parserRule = haulWebpackConfig.module.rules[0];
@@ -203,6 +204,7 @@ module.exports = (env) => {
          */
         haulTsxRule.exclude = [
             haulTsxRule.exclude,
+            // ./Users/jamie/Documents/git/react-native-in-nativescript/node_modules/react-native/Libraries/Core/InitializeCore.js (2.56 KB)
             nativeScriptSourcesDirpath,
         ];
 
@@ -335,6 +337,8 @@ module.exports = (env) => {
     } else {
         baseConfig.plugins = baseConfig.plugins.filter(p => !(p && p.constructor && p.constructor.name === "HotModuleReplacementPlugin"));
     }
+
+    baseConfig.plugins.push(new BundleAnalyzerPlugin());
 
     return baseConfig;
 };
