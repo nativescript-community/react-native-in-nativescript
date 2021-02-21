@@ -28,7 +28,7 @@ module.exports = (env) => {
     const isAnySourceMapEnabled = !!env.sourceMap || !!env.hiddenSourceMap;
 
     const baseConfig = webpackConfig(env);
-    console.log(`baseConfig original`, baseConfig);
+    // console.log(`baseConfig original`, baseConfig);
     const platform = env && (env.android && "android" || env.ios && "ios" || env.platform);
     const projectRoot = __dirname;
 
@@ -161,6 +161,7 @@ module.exports = (env) => {
             ...baseConfig.entry,
             // Our app.ts gets polyfilled. We'll exclude InitializeCore.js because it's running too early.
             bundle: haulWebpackConfig.entry.filter(entrypointFile => entrypointFile.indexOf("InitializeCore.js") === -1),
+            // bundle: haulWebpackConfig.entry.filter(entrypointFile => entrypointFile.indexOf("app.ts") > -1), // No polyfills at all
         };
 
         const parserRule = haulWebpackConfig.module.rules[0];
@@ -198,13 +199,35 @@ module.exports = (env) => {
         tsxRule.include = nativeScriptSourcesDirpath;
 
         /**
-         * Originally this:
-         * /node_modules(?!.*[\/\\](react|@react-navigation|@react-native-community|@expo|pretty-format|@haul-bundler|metro))/
-         * I've added in @nativescript and @nativescript-community.
+         * haulTsxRule.exclude:
+         *   /node_modules(?!.*[\/\\](react|@react-navigation|@react-native-community|@expo|pretty-format|@haul-bundler|metro))/
+         * Which means:
+         *   Search for node_modules, but only if:
+         *     It's NOT followed by any number of any character, then a directory separator, then one of the following package names.
+         * 
+         * In other words:
+         * "The most commonly documented method of excluding all but one node_module is a regex that excludes a package with a negative lookahead"
+         * @see https://github.com/gatsbyjs/gatsby/issues/4044
+         * 
+         * So it'll match:
+         * - node_modules/foo (thus excluding it)
+         * - node_modules/react            (thus not excluding it, ergo including it)
+         * - node_modules/react-native     (thus not excluding it, ergo including it)
+         * - node_modules/react-reconciler (thus not excluding it, ergo including it)
+         * 
+         * Problem: the moment I add in this rule, I get "TypeError: ReactReconciler is not a function", despite it clearly having made it into the
+         * bundle.
+         * 
+         * I've tried altering the pattern to this to ensure that react-reconciler gets excluded from the rule, but it still meets the same failure.
+         *   /node_modules(?!.*[\/\\](react[\/\\]|react-native|@react-navigation|@react-native-community|@expo|pretty-format|@haul-bundler|metro))/
+         * 
+         * Even if I set the rule to exclude everything, it meets this failure. So it's the presence of the rule itself, not the modules it's
+         * including/excluding that lead to react-reconciler going faulty.
+         * 
+         * So for now I'm giving up on mixing RNS with RN. But we can still have a vanilla NativeScript project hosting an RN root.
          */
         haulTsxRule.exclude = [
             haulTsxRule.exclude,
-            // ./Users/jamie/Documents/git/react-native-in-nativescript/node_modules/react-native/Libraries/Core/InitializeCore.js (2.56 KB)
             nativeScriptSourcesDirpath,
         ];
 
@@ -280,7 +303,16 @@ module.exports = (env) => {
         1,
         new webpack.DefinePlugin({
             ...existingDefinePlugin.definitions,
-            ...(useReactNative ? haulDefinePlugin.definitions : []),
+            ...(
+                useReactNative ? 
+                {
+                    ...haulDefinePlugin.definitions,
+                    // "global.__fbBatchedBridgeConfig": JSON.stringify({
+                    //     // Have to fill in all of these: https://github.com/facebook/react-native/blob/b28fa2dae061cff829e00afec565fe8a05ef0a5a/jest/setup.js#L177
+                    // })
+                } :
+                {}
+            ),
             /** For various libraries in the React ecosystem. */
             "__DEV__": production ? "false" : "true",
             "__TEST__": "false",
@@ -317,7 +349,7 @@ module.exports = (env) => {
         baseConfig.stats = "verbose";
     }
 
-    console.log("haulWebpackConfig:", haulWebpackConfig);
+    // console.log("haulWebpackConfig:", haulWebpackConfig);
     console.log("baseConfig:", baseConfig);
 
     if(hmr && !production){
@@ -338,7 +370,6 @@ module.exports = (env) => {
         baseConfig.plugins = baseConfig.plugins.filter(p => !(p && p.constructor && p.constructor.name === "HotModuleReplacementPlugin"));
     }
 
-    baseConfig.plugins.push(new BundleAnalyzerPlugin());
 
     return baseConfig;
 };

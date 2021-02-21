@@ -1,13 +1,26 @@
-import * as React from 'react';
+// import * as React from 'react';
 /* Controls react-nativescript log verbosity. true: all logs; false: only error logs. */
-Object.defineProperty(global, '__DEV__', { value: false });
-import * as ReactNativeScript from 'react-nativescript';
-import { mainStackNavigator as AppContainer } from './components/Navigator';
+// Object.defineProperty(global, '__DEV__', { value: false });
+// import * as ReactNativeScript from 'react-nativescript';
+// import { mainStackNavigator as AppContainer } from './components/Navigator';
 // import { MyDelegate } from './AppDelegate';
 // import { Application } from '@nativescript/core';
 // Application.ios.delegate = MyDelegate;
 
+import { Application, ContentView } from '@nativescript/core';
+
 console.log(`App entrypoint!`);
+
+Application.run({
+    create: () => {
+        const root = new ContentView();
+
+        root.backgroundColor = "yellow";
+
+        return root;
+    },
+});
+
 
 /**
  * Our log here doesn't get executed, as the app hits a JS exception first.
@@ -37,9 +50,11 @@ console.log(`App entrypoint!`);
  * Turned out, this is because one of our entrypoints was InitializeCore.js! Just had to remove it.
  * 
  * Now it can't find ReactReconciler. That'll probably be because we need to use the exact same version of react that React Native uses.
+ * 
+ * ... Well that wasn't it. We're using react-reconciler@0.25.1, which is the appropriate one for both RN and RNS: https://github.com/facebook/react/blob/6818a2aa0137ab0a3b802c193cc6bd2959c89256/packages/react-reconciler/package.json#L29
  */
 
-ReactNativeScript.start(React.createElement(AppContainer, {}, null));
+// ReactNativeScript.start(React.createElement(AppContainer, {}, null));
 
 /*
 Do not place any code after the application has been started as it will not
