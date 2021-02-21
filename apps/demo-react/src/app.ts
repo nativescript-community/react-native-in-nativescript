@@ -3,17 +3,18 @@
 // Object.defineProperty(global, '__DEV__', { value: false });
 // import * as ReactNativeScript from 'react-nativescript';
 // import { mainStackNavigator as AppContainer } from './components/Navigator';
-// import { MyDelegate } from './AppDelegate';
 // import { Application } from '@nativescript/core';
-// Application.ios.delegate = MyDelegate;
-
+import { MyDelegate } from './nativescript-compat/AppDelegate';
 import { Application, ContentView } from '@nativescript/core';
+Application.ios.delegate = MyDelegate;
 
 console.log(`App entrypoint!`);
 
 Application.run({
     create: () => {
         const root = new ContentView();
+        console.log("Application.ios", Application.ios);
+        console.log("Application.ios.delegate", Application.ios.delegate);
 
         root.backgroundColor = "yellow";
 
