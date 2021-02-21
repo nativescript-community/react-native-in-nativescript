@@ -25,10 +25,18 @@ class MyDelegate extends UIResponder implements UIApplicationDelegate, RCTBridge
     }
 
     sourceURLForBridge(bridge: RCTBridge): NSURL {
-        if(__DEV__){
-            return RCTBundleURLProvider.sharedSettings().jsBundleURLForBundleRootFallbackResource("index", null);
-        }
-        return NSBundle.mainBundle.URLForResourceWithExtension("main", "jsbundle");
+        const bundleRoot = NSURL.alloc().initFileURLWithPathIsDirectoryRelativeToURL(
+            "app",
+            true,
+            NSBundle.mainBundle.bundleURL,
+        );
+        return bundleRoot.URLByAppendingPathComponentIsDirectory("bundle", false).URLByAppendingPathExtension("js");
+
+        // if(__DEV__){
+        //     return RCTBundleURLProvider.sharedSettings().jsBundleURLForBundleRootFallbackResource("index", null);
+        // }
+
+        // return NSBundle.mainBundle.URLForResourceWithExtension("main", "jsbundle");
     }
 }
 
